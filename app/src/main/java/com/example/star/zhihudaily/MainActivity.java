@@ -10,6 +10,7 @@ import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.api.model.Themes;
 import com.example.star.zhihudaily.base.BaseActivity;
+import com.example.star.zhihudaily.widget.CustomPrimaryDrawerItem;
 import com.google.gson.Gson;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -124,7 +125,8 @@ public class MainActivity extends BaseActivity {
         int i = 1;
         for (ThemeDesc themeDesc : mThemes.others) {
             Log.e(TAG, new Gson().toJson(themeDesc).toString());
-            PrimaryDrawerItem drawerItem = new PrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.header).withIdentifier(i).withSelectable(false);
+//            PrimaryDrawerItem drawerItem = new PrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.header).withIdentifier(i).withSelectable(false);
+            PrimaryDrawerItem drawerItem = new CustomPrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.btn_star_big_on_selected).withIdentifier(i).withSelectable(false);
             mDrawerItems.add(drawerItem);
             i++;
         }
