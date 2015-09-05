@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity {
         for (ThemeDesc themeDesc : mThemes.others) {
             Log.e(TAG, new Gson().toJson(themeDesc).toString());
 //            PrimaryDrawerItem drawerItem = new PrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.header).withIdentifier(i).withSelectable(false);
-            PrimaryDrawerItem drawerItem = new CustomPrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.btn_star_big_on_selected).withIdentifier(i).withSelectable(false);
+            PrimaryDrawerItem drawerItem = new CustomPrimaryDrawerItem().withName(themeDesc.name).withIcon(R.drawable.menu_follow).withIdentifier(i).withSelectable(false);
             mDrawerItems.add(drawerItem);
             i++;
         }
