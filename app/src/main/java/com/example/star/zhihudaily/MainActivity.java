@@ -52,16 +52,11 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         mAppAPI = new AppAPI(this);
 
-        //Remove line to test RTL support
-        //getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-
-        // Handle Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setTitle(R.string.header);
 
-        // Create a few sample profile
         final IProfile profile = new ProfileDrawerItem().withName("xingxing").withEmail("xxx823952375@gmail.com").withIcon("http://pic3.zhimg.com/0e71e90fd6be47630399d63c58beebfc.jpg");
 
         // Create the AccountHeader

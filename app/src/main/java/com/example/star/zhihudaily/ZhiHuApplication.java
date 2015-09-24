@@ -27,7 +27,12 @@ public class ZhiHuApplication extends Application {
             }
 
             @Override
-            public Drawable placeholder(Context ctx) {
+            public Drawable placeholder(Context context) {
+                return null;
+            }
+
+            @Override
+            public Drawable placeholder(Context context, String s) {
                 return null;
             }
         });
