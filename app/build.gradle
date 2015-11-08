@@ -25,13 +25,6 @@ dependencies {
     compile project(':SlidingMenu')
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.jakewharton:butterknife:6.1.0'
-    compile('com.mikepenz:materialdrawer:4.3.0@aar') {
-        transitive = true
-    }
-    compile 'com.mikepenz:crossfader:1.0.3@aar'
-    compile 'com.mikepenz:google-material-typeface:1.2.0.1@aar'
-    compile 'com.mikepenz:fontawesome-typeface:4.4.0.1@aar'
-    compile 'com.mikepenz:octicons-typeface:3.0.0.1@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'

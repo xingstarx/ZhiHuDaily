@@ -13,12 +13,12 @@
         android:name=".ZhiHuApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/ZhiHuTheme"
+        android:theme="@style/AppTheme.Theme"
         android:label="@string/app_name">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/ZhiHuTheme.NoActionBar">
+            android:theme="@style/AppTheme.Theme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
