@@ -34,7 +34,11 @@
         <FrameLayout
             android:id="@+id/menu_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></FrameLayout>
+            android:layout_height="match_parent">
+
+            <include layout="@layout/main_drawer_view" />
+
+        </FrameLayout>
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>
