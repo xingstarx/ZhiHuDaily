@@ -74,8 +74,8 @@
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:divider="@null" />
+        android:divider="@android:color/transparent"
+        android:listSelector="@android:color/transparent" />
 
 
 </LinearLayout>

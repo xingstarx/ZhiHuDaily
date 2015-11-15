@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,7 +27,7 @@ import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.api.model.Themes;
 import com.example.star.zhihudaily.base.BaseActivity;
-import com.example.star.zhihudaily.base.ListBaseAdapter;
+import com.example.star.zhihudaily.base.ListHeaderBaseAdapter;
 import com.example.star.zhihudaily.base.ThemeDescDb;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
@@ -50,14 +51,16 @@ public class MainActivity extends BaseActivity {
     private View mMenuContent;
     private ListView mListView;
     private String[] mPlanetTitles;
+    private int mLastSelection;
+    private Themes mThemes;
+    private ThemeDescAdapter mThemeDescAdapter;
     AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
+            mThemeDescAdapter.notifyDataSetInvalidated();//刷新页面,设置点击后,选中改行效果
         }
     };
-    private Themes mThemes;
-    private ThemeDescAdapter mThemeDescAdapter;
     private ThemeDescDb mThemeDescDb;
 
     @Override
@@ -109,13 +112,14 @@ public class MainActivity extends BaseActivity {
 
 
     private void initListViewData() {
-        mThemeDescAdapter = new ThemeDescAdapter(MainActivity.this, new ArrayList<>(mThemes.others), R.layout.draw_layout_item);
+        mThemeDescAdapter = new ThemeDescAdapter(MainActivity.this, new ArrayList<>(mThemes.others), R.layout.draw_layout_item, R.layout.draw_layout_item_header);
         mListView.setAdapter(mThemeDescAdapter);
         mListView.setOnItemClickListener(mOnItemClickListener);
         selectItem(0);
     }
 
     private void selectItem(int position) {
+        this.mLastSelection = position;
         Fragment fragment = new PlanetFragment();
         Bundle args = new Bundle();
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
@@ -205,14 +209,31 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public class ThemeDescAdapter extends ListBaseAdapter<ThemeDesc> {
-
+    public class ThemeDescAdapter extends ListHeaderBaseAdapter<ThemeDesc> {
         public ThemeDescAdapter(Context ctx, ArrayList<ThemeDesc> dataList, int theRowResourceId) {
             super(ctx, dataList, theRowResourceId);
         }
 
+        public ThemeDescAdapter(Context ctx, ArrayList<ThemeDesc> dataList, int theRowResourceId, int headerViewResourceId) {
+            super(ctx, dataList, theRowResourceId, headerViewResourceId);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parentView) {
+            View view = super.getView(position, convertView, parentView);
+            if (position == mLastSelection) {
+                view.setBackgroundColor(Color.rgb(239, 240, 241));
+            } else {
+                view.setBackgroundColor(Color.TRANSPARENT);
+            }
+            return view;
+        }
+
         @Override
         public void prepareViewForDisplay(View view, final ThemeDesc dataItem) {
+            if (dataItem == null) {
+                return;
+            }
             TextView textView = (TextView) view.findViewById(R.id.draw_item_text);
             ImageView imageView = (ImageView) view.findViewById(R.id.draw_item_icon);
             View drawItemIconLayout = view.findViewById(R.id.draw_item_icon_layout);
@@ -220,8 +241,8 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(MainActivity.this, "show infos", Toast.LENGTH_SHORT).show();
-                    if(dataItem.is_like==false){
-                        dataItem.is_like=true;
+                    if (dataItem.is_like == false) {
+                        dataItem.is_like = true;
                         mThemeDescDb.open();
                         mThemeDescDb.update(dataItem);
                         mThemeDescDb.close();
@@ -230,9 +251,9 @@ public class MainActivity extends BaseActivity {
                 }
             });
             textView.setText(dataItem.name);
-            if(dataItem.is_like==false){
+            if (dataItem.is_like == false) {
                 imageView.setImageResource(R.drawable.ic_menu_arrow);
-            }else {
+            } else {
                 imageView.setImageResource(R.drawable.ic_menu_follow);
             }
         }
