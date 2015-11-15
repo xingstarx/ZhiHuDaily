@@ -27,6 +27,9 @@ import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.api.model.Themes;
 import com.example.star.zhihudaily.base.BaseActivity;
 import com.example.star.zhihudaily.base.ListBaseAdapter;
+import com.example.star.zhihudaily.base.ThemeDescDb;
+import com.example.star.zhihudaily.util.LogUtils;
+import com.example.star.zhihudaily.util.SharedPrefsUtils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -55,12 +58,14 @@ public class MainActivity extends BaseActivity {
     };
     private Themes mThemes;
     private ThemeDescAdapter mThemeDescAdapter;
+    private ThemeDescDb mThemeDescDb;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAppAPI = new AppAPI(this);
+        mThemeDescDb = new ThemeDescDb(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         setSupportActionBar(toolbar);
@@ -74,21 +79,34 @@ public class MainActivity extends BaseActivity {
         mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_string, R.string.close_string);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
-        mSubscription = AppObservable.bindActivity(this, mAppAPI.themes()).subscribe(new Action1<Themes>() {
-            @Override
-            public void call(Themes themes) {
-                mThemes = themes;
-                Log.e(TAG, new Gson().toJson(mThemes));
-                initListViewData();
 
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                Log.e(TAG, "Error Infos");
-            }
-        });
+        if (SharedPrefsUtils.getBooleanPreference(this, Settings.ZHIHU_HAS_THEME_THEMEDESC, false)) {
+            mThemeDescDb.open();
+            mThemes = mThemeDescDb.findAllThemes();
+            mThemeDescDb.close();
+            initListViewData();
+        } else {
+            mSubscription = AppObservable.bindActivity(this, mAppAPI.themes()).subscribe(new Action1<Themes>() {
+                @Override
+                public void call(Themes themes) {
+                    mThemes = themes;
+                    LogUtils.d(TAG, new Gson().toJson(mThemes));
+                    mThemeDescDb.open();
+                    mThemeDescDb.addAllThemes(themes);
+                    mThemeDescDb.close();
+                    SharedPrefsUtils.setBooleanPreference(MainActivity.this, Settings.ZHIHU_HAS_THEME_THEMEDESC, true);
+                    initListViewData();
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    Log.e(TAG, "Error Infos");
+                }
+            });
+        }
+
     }
+
 
     private void initListViewData() {
         mThemeDescAdapter = new ThemeDescAdapter(MainActivity.this, new ArrayList<>(mThemes.others), R.layout.draw_layout_item);
@@ -194,18 +212,29 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void prepareViewForDisplay(View view, ThemeDesc dataItem) {
+        public void prepareViewForDisplay(View view, final ThemeDesc dataItem) {
             TextView textView = (TextView) view.findViewById(R.id.draw_item_text);
             ImageView imageView = (ImageView) view.findViewById(R.id.draw_item_icon);
-            View drawItemIconLayout=view.findViewById(R.id.draw_item_icon_layout);
+            View drawItemIconLayout = view.findViewById(R.id.draw_item_icon_layout);
             drawItemIconLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(MainActivity.this, "show infos", Toast.LENGTH_SHORT).show();
+                    if(dataItem.is_like==false){
+                        dataItem.is_like=true;
+                        mThemeDescDb.open();
+                        mThemeDescDb.update(dataItem);
+                        mThemeDescDb.close();
+                        notifyDataSetChanged();
+                    }
                 }
             });
             textView.setText(dataItem.name);
-            imageView.setImageResource(R.drawable.ic_menu_arrow);
+            if(dataItem.is_like==false){
+                imageView.setImageResource(R.drawable.ic_menu_arrow);
+            }else {
+                imageView.setImageResource(R.drawable.ic_menu_follow);
+            }
         }
     }
 }

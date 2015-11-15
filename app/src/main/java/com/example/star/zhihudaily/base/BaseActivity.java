@@ -46,7 +46,7 @@ public class BaseActivity extends AppCompatActivity {
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        switch (item.getItemId()) {
-//            case android.R.id.home:
+//            case android.R.themeId.home:
 //                finish();
 //                return true;
 //        }
