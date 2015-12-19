@@ -1,12 +1,12 @@
 package com.example.star.zhihudaily;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -54,6 +54,7 @@ public class MainActivity extends BaseActivity {
     private int mLastSelection;
     private Themes mThemes;
     private ThemeDescAdapter mThemeDescAdapter;
+    private MainFragment mainFragment;
     AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -120,12 +121,18 @@ public class MainActivity extends BaseActivity {
 
     private void selectItem(int position) {
         this.mLastSelection = position;
-        Fragment fragment = new PlanetFragment();
+        Fragment fragment;
+        LogUtils.d(TAG,"position=="+position);
+        if(position==0){
+            fragment=MainFragment.newInstance("","");
+        }else{
+            fragment=new PlanetFragment();
+        }
         Bundle args = new Bundle();
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
         fragment.setArguments(args);
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_container, fragment).commit();
 
         // update selected item and title, then close the drawer
