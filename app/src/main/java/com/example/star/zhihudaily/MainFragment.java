@@ -41,8 +41,6 @@ import rx.subscriptions.Subscriptions;
 public class MainFragment extends Fragment {
     public static final String TAG = MainFragment.class.getSimpleName();
     private static final String ARG_TITLE = "title";
-    private static final int MENU_ACTION_MODE_DAILY = Menu.FIRST;
-    private static final int MENU_ACTION_MODE_NIGHT = Menu.FIRST + 1;
     private Activity mActivity;
     private String mTitle;
     private SwipeRefreshLayout mSwipeRefreshLayout;
