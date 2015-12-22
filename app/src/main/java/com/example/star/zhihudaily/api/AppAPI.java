@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.StoryDetail;
-import com.example.star.zhihudaily.api.model.ThemeItem;
+import com.example.star.zhihudaily.api.model.StoryNews;
 import com.example.star.zhihudaily.api.model.Themes;
 
 import rx.Observable;
@@ -36,7 +36,11 @@ public class AppAPI extends BaseAPI {
         return mAppAPI.themes();
     }
 
-    public Observable<ThemeItem> themeItem(String id) {
+    public Observable<StoryNews> themeItem(int id) {
         return mAppAPI.themeItem(id);
+    }
+
+    public Observable<StoryNews> latestBefore(int themeId, long storyId) {
+        return mAppAPI.latestBefore(themeId, storyId);
     }
 }

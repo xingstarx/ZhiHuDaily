@@ -2,7 +2,7 @@ package com.example.star.zhihudaily.api;
 
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.StoryDetail;
-import com.example.star.zhihudaily.api.model.ThemeItem;
+import com.example.star.zhihudaily.api.model.StoryNews;
 import com.example.star.zhihudaily.api.model.Themes;
 
 import retrofit.http.GET;
@@ -33,6 +33,11 @@ public interface IAppAPI {
     Observable<Themes> themes();
 
     @GET("/theme/{id}")
-    Observable<ThemeItem> themeItem(@Path("id") String id);
+    Observable<StoryNews> themeItem(@Path("id") int id);
+
+    //http://news-at.zhihu.com/api/4/theme/13/before/4737612
+    @GET("/theme/{themeId}/before/{storyId}")
+    Observable<StoryNews> latestBefore(@Path("themeId") int themeId, @Path("storyId") long storyId);
+
 
 }

@@ -15,9 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.star.zhihudaily.api.AppAPI;
-import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.Story;
+import com.example.star.zhihudaily.api.model.StoryNews;
 import com.example.star.zhihudaily.api.model.ThemeDesc;
+import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
 import com.example.star.zhihudaily.util.LogUtils;
@@ -42,12 +43,8 @@ public class ThemeItemFragment extends Fragment {
     private List<Story> mStoryList = new ArrayList<>();
     private Subscription mSubscription = Subscriptions.empty();
     private AppAPI mAppAPI;
-    private LatestNews mLatestNews;
+    private StoryNews mStoryNews;
     private ThemeDesc mThemeDesc;
-
-    public ThemeItemFragment() {
-        // Required empty public constructor
-    }
 
     public static ThemeItemFragment newInstance(ThemeDesc themeDesc) {
         ThemeItemFragment fragment = new ThemeItemFragment();
@@ -78,9 +75,9 @@ public class ThemeItemFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_fragment_theme, menu);
-        if(mThemeDesc.is_like){
+        if (mThemeDesc.is_like) {
             menu.findItem(R.id.action_theme_remove).setVisible(false);
-        }else {
+        } else {
             menu.findItem(R.id.action_theme_add).setVisible(false);
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -98,13 +95,16 @@ public class ThemeItemFragment extends Fragment {
     }
 
     private void fetchData() {
-        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.latest()).subscribe(new Action1<LatestNews>() {
+        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.themeItem(mThemeDesc.id)).subscribe(new Action1<StoryNews>() {
             @Override
-            public void call(LatestNews latestNews) {
-                mLatestNews = latestNews;
-                mStoryList = latestNews.stories;
-                mMainAdapter.setAdapter(mStoryList);
+            public void call(StoryNews storyNews) {
+                mStoryNews = storyNews;
+                mStoryList = storyNews.stories;
+                mMainAdapter.setData(mStoryList);
                 mMainAdapter.notifyDataSetChanged();
+                if (mSwipeRefreshLayout.isRefreshing()) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
         }, new Action1<Throwable>() {
             @Override
@@ -123,12 +123,52 @@ public class ThemeItemFragment extends Fragment {
                 R.color.google_red,
                 R.color.google_yellow
         );
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                doRefresh();
+            }
+        });
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
         mRecyclerView.setAdapter(mMainAdapter);
+        EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
+        onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
+            @Override
+            public void onLoadNextPage(View view) {
+                loadMore();
+            }
+        });
+        mRecyclerView.addOnScrollListener(onScrollerListener);
+
+    }
+
+    private void loadMore() {
+        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.latestBefore(mThemeDesc.id, mStoryList.get(mStoryList.size() - 1).id)).subscribe(new Action1<StoryNews>() {
+            @Override
+            public void call(StoryNews storyNews) {
+                mStoryList.addAll(storyNews.stories);
+                mMainAdapter.setData(mStoryList);
+                mMainAdapter.notifyDataSetChanged();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+
+            }
+        });
+
+    }
+
+
+    private void doRefresh() {
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
+        fetchData();
     }
 
     @Override
@@ -157,7 +197,8 @@ public class ThemeItemFragment extends Fragment {
             super(context, list);
         }
 
-        public void setAdapter(List<Story> storyList) {
+
+        public void setData(List<Story> storyList) {
             this.list = storyList;
         }
 
