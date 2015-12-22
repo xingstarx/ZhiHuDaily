@@ -4,14 +4,16 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.star.zhihudaily.base.ThemeDescDb;
+import com.example.star.zhihudaily.base.db.ThemeDescDb;
+
+import java.io.Serializable;
 
 /**
  * Created by xiongxingxing on 15/9/5.
  *
  * @desc 主题分类
  */
-public class ThemeDesc {
+public class ThemeDesc implements Serializable{
     public long color;
     public String thumbnail;
     public String description;

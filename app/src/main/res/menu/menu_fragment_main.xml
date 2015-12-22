@@ -4,13 +4,20 @@
 
     <item
         android:id="@+id/action_notification"
+        android:icon="@drawable/ic_menu_notification"
         android:title="@string/action_notification"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_mode"
-        android:title="@string/action_mode"
+        android:id="@+id/action_daily_mode"
+        android:title="@string/action_daily_mode"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_night_mode"
+        android:title="@string/action_night_mode"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"

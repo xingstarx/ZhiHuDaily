@@ -9,4 +9,5 @@ public class LatestNews {
     public String date;
     public List<Story> stories;
     public List<Story> top_stories;
+    public LatestNews beforeLatestNews;//reference ,接口中并未使用到
 }

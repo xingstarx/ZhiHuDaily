@@ -1,4 +1,4 @@
-package com.example.star.zhihudaily.base;
+package com.example.star.zhihudaily.base.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

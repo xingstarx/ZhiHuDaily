@@ -31,21 +31,14 @@
     <string name="open_string">open</string>
     <string name="close_string">close</string>
 
-    <string-array name="planets_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-    </string-array>
-
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="action_notification">通知</string>
-    <string name="action_mode">夜间模式</string>
+    <string name="action_night_mode">夜间模式</string>
+    <string name="action_daily_mode">日间模式</string>
+    <string name="empty_text">empty is null</string>
+    <string name="action_theme_add">关注</string>
+    <string name="action_theme_remove">取消关注</string>
 
 
 </resources>

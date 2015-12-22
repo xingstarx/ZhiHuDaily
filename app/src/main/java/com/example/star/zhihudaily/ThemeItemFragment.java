@@ -13,51 +13,46 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.Story;
-import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
+import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
-import com.example.star.zhihudaily.util.DateUtils;
 import com.example.star.zhihudaily.util.LogUtils;
-import com.example.star.zhihudaily.util.SharedPrefsUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.functions.Action1;
-import rx.functions.Func2;
 import rx.subscriptions.Subscriptions;
 
 
-public class MainFragment extends Fragment {
-    public static final String TAG = MainFragment.class.getSimpleName();
-    private static final String ARG_TITLE = "title";
-    private static final int MENU_ACTION_MODE_DAILY = Menu.FIRST;
-    private static final int MENU_ACTION_MODE_NIGHT = Menu.FIRST + 1;
+public class ThemeItemFragment extends Fragment {
+    public static final String TAG = ThemeItemFragment.class.getSimpleName();
+    private static final String ARG_THEME_DESC = "themeDesc";
     private Activity mActivity;
-    private String mTitle;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private MainAdapter mMainAdapter;
     private List<Story> mStoryList = new ArrayList<>();
     private Subscription mSubscription = Subscriptions.empty();
     private AppAPI mAppAPI;
-    private String mCurrentDateStr = DateUtils.dateToString(new Date(), DateUtils.yyyyMMDD);
-    private String mRefreshDateStr;
+    private LatestNews mLatestNews;
+    private ThemeDesc mThemeDesc;
 
-    public static MainFragment newInstance(String title) {
-        MainFragment fragment = new MainFragment();
+    public ThemeItemFragment() {
+        // Required empty public constructor
+    }
+
+    public static ThemeItemFragment newInstance(ThemeDesc themeDesc) {
+        ThemeItemFragment fragment = new ThemeItemFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_TITLE, title);
+        args.putSerializable(ARG_THEME_DESC, themeDesc);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,7 +62,7 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mAppAPI = new AppAPI(mActivity);
-        mTitle = getArguments().getString(ARG_TITLE);
+        mThemeDesc = (ThemeDesc) getArguments().getSerializable(ARG_THEME_DESC);
     }
 
     @Override
@@ -82,11 +77,11 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.menu_fragment_main, menu);
-        if (SharedPrefsUtils.getBooleanPreference(mActivity, Settings.ZHIHU_ACTION_MODE, true)) {
-            menu.findItem(R.id.action_daily_mode).setVisible(false);
-        } else {
-            menu.findItem(R.id.action_night_mode).setVisible(false);
+        inflater.inflate(R.menu.menu_fragment_theme, menu);
+        if(mThemeDesc.is_like){
+            menu.findItem(R.id.action_theme_remove).setVisible(false);
+        }else {
+            menu.findItem(R.id.action_theme_add).setVisible(false);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -94,54 +89,30 @@ public class MainFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_notification:
+            case R.id.action_theme_add:
                 break;
-            case R.id.action_daily_mode:
-                SharedPrefsUtils.setBooleanPreference(mActivity, Settings.ZHIHU_ACTION_MODE, true);
-                mActivity.invalidateOptionsMenu();
+            case R.id.action_theme_remove:
                 break;
-            case R.id.action_night_mode:
-                SharedPrefsUtils.setBooleanPreference(mActivity, Settings.ZHIHU_ACTION_MODE, false);
-                mActivity.invalidateOptionsMenu();
-                break;
-            case R.id.action_settings:
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * 第一次，加载两页，是latest api接口，接着是加载before currentdate的数据，应该是同时并发处理的。http://news-at.zhihu.com/api/4/stories/latest，
-     * http://news-at.zhihu.com/api/4/stories/before/20151219
-     * 首页的加载更多应该就是这样做的了。接下来的加载更多也是一样的处理方式，，加载before currentDate -1
-     */
     private void fetchData() {
-        LogUtils.d(TAG, "mCurrentDateStr==" + mCurrentDateStr);
-        mSubscription = AppObservable.bindSupportFragment(this, Observable.zip(mAppAPI.latest(), mAppAPI.latestBefore(mCurrentDateStr),
-                new Func2<LatestNews, LatestNews, LatestNews>() {
-                    @Override
-                    public LatestNews call(LatestNews latestNews, LatestNews beforeLatestNews) {
-                        latestNews.beforeLatestNews = beforeLatestNews;
-                        return latestNews;
-                    }
-                })).subscribe(new Action1<LatestNews>() {
+        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.latest()).subscribe(new Action1<LatestNews>() {
             @Override
             public void call(LatestNews latestNews) {
+                mLatestNews = latestNews;
                 mStoryList = latestNews.stories;
-                mStoryList.addAll(latestNews.beforeLatestNews.stories);
-                mMainAdapter.setData(mStoryList);
-                mRefreshDateStr = latestNews.beforeLatestNews.date;
+                mMainAdapter.setAdapter(mStoryList);
                 mMainAdapter.notifyDataSetChanged();
-                if (mSwipeRefreshLayout.isRefreshing()) {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                Toast.makeText(mActivity, "MainFragment throwable==" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
+
     }
 
     private void initViews(View view) {
@@ -152,55 +123,13 @@ public class MainFragment extends Fragment {
                 R.color.google_red,
                 R.color.google_yellow
         );
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                doRefresh();
-            }
-        });
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
         mRecyclerView.setAdapter(mMainAdapter);
-        EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
-        onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
-            @Override
-            public void onLoadNextPage(View view) {
-                loadMore();
-            }
-        });
-        mRecyclerView.addOnScrollListener(onScrollerListener);
     }
-
-    /**
-     * load more data logic
-     */
-    private void loadMore() {
-        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.latestBefore(mRefreshDateStr)).subscribe(new Action1<LatestNews>() {
-            @Override
-            public void call(LatestNews latestNews) {
-                mStoryList.addAll(latestNews.stories);
-                mMainAdapter.setData(mStoryList);
-                mRefreshDateStr = latestNews.date;
-                mMainAdapter.notifyDataSetChanged();
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-
-            }
-        });
-    }
-
-    private void doRefresh() {
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-        fetchData();
-    }
-
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -228,7 +157,7 @@ public class MainFragment extends Fragment {
             super(context, list);
         }
 
-        public void setData(List<Story> storyList) {
+        public void setAdapter(List<Story> storyList) {
             this.list = storyList;
         }
 

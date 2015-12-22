@@ -24,6 +24,10 @@ public class AppAPI extends BaseAPI {
         return mAppAPI.latest();
     }
 
+    public Observable<LatestNews> latestBefore(String id) {
+        return mAppAPI.latestBefore(id);
+    }
+
     public Observable<StoryDetail> storyDetail(String id) {
         return mAppAPI.storyDetail(id);
     }

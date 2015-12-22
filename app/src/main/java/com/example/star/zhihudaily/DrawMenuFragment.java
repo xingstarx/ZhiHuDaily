@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.star.zhihudaily.base.ListBaseAdapter;
+import com.example.star.zhihudaily.base.adapter.ListBaseAdapter;
 
 import java.util.ArrayList;
 

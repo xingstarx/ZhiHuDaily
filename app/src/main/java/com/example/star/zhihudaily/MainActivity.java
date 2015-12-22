@@ -1,8 +1,6 @@
 package com.example.star.zhihudaily;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,10 +9,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,8 +21,8 @@ import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.api.model.Themes;
 import com.example.star.zhihudaily.base.BaseActivity;
-import com.example.star.zhihudaily.base.ListHeaderBaseAdapter;
-import com.example.star.zhihudaily.base.ThemeDescDb;
+import com.example.star.zhihudaily.base.adapter.ListHeaderBaseAdapter;
+import com.example.star.zhihudaily.base.db.ThemeDescDb;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
 import com.google.gson.Gson;
@@ -50,7 +44,6 @@ public class MainActivity extends BaseActivity {
     private View mMenuContainer;
     private View mMenuContent;
     private ListView mListView;
-    private String[] mPlanetTitles;
     private int mLastSelection;
     private Themes mThemes;
     private ThemeDescAdapter mThemeDescAdapter;
@@ -75,12 +68,10 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white);
-        setTitle("首页");
 
         mMenuContainer = findViewById(R.id.menu_container);
         mMenuContent = findViewById(R.id.menu_content);
         mListView = (ListView) findViewById(R.id.listview);
-        mPlanetTitles = getResources().getStringArray(R.array.planets_array);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_string, R.string.close_string);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
@@ -122,22 +113,24 @@ public class MainActivity extends BaseActivity {
     private void selectItem(int position) {
         this.mLastSelection = position;
         Fragment fragment;
-        LogUtils.d(TAG,"position=="+position);
-        if(position==0){
-            fragment=MainFragment.newInstance("","");
-        }else{
-            fragment=new PlanetFragment();
+        LogUtils.d(TAG, "position==" + position);
+        if (position == 0) {
+            if (mainFragment != null) {
+                fragment = mainFragment;
+            } else {
+                mainFragment = MainFragment.newInstance("首页");
+                fragment = mainFragment;
+            }
+            getSupportActionBar().setTitle("首页");
+        } else {
+            fragment = ThemeItemFragment.newInstance(mThemes.others.get(position - 1));
+            getSupportActionBar().setTitle(mThemes.others.get(position - 1).name);
         }
-        Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        fragment.setArguments(args);
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_container, fragment).commit();
 
         // update selected item and title, then close the drawer
         mListView.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
         drawerLayout.closeDrawer(mMenuContainer);
 
     }
@@ -149,71 +142,9 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    /* Called whenever we call invalidateOptionsMenu() */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = drawerLayout.isDrawerOpen(mMenuContainer);
-        menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        // Handle action buttons
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // create intent to perform web search for this planet
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
-                // catch event that there's no activity to handle intent
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "app_not_available", Toast.LENGTH_LONG).show();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         mSubscription.unsubscribe();
-    }
-
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
-    public static class PlanetFragment extends Fragment {
-        public static final String ARG_PLANET_NUMBER = "planet_number";
-
-        public PlanetFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_planet, container, false);
-            int i = getArguments().getInt(ARG_PLANET_NUMBER);
-            String planet = getResources().getStringArray(R.array.planets_array)[i];
-            ((TextView) rootView.findViewById(R.id.textview)).setText(planet);
-            getActivity().setTitle(planet);
-            return rootView;
-        }
     }
 
     public class ThemeDescAdapter extends ListHeaderBaseAdapter<ThemeDesc> {

@@ -17,11 +17,10 @@ import retrofit.client.OkClient;
 public class BaseAPI {
 
     private static final String endPoint = "http://news-at.zhihu.com/api/4/";
-    private RestAdapter restAdapter;
-    private OkHttpClient okHttpClient;
-
     private static final int TIMEOUT_MILLISEC = 5000;
     private static final long CACHE_SIZE = 10 * 1024 * 1024;
+    private RestAdapter restAdapter;
+    private OkHttpClient okHttpClient;
 
     public BaseAPI(Context context) {
         File cacheDir = new File(context.getCacheDir(), "ZhiHuCache");
@@ -32,7 +31,7 @@ public class BaseAPI {
         builder.setEndpoint(endPoint);//设置远程地址
         builder.setClient(new OkClient(okHttpClient));
         builder.setLogLevel(
-                RestAdapter.LogLevel.FULL);
+                RestAdapter.LogLevel.BASIC);
         restAdapter = builder.build();
     }
 

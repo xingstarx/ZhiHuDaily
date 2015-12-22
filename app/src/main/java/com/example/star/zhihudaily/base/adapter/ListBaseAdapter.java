@@ -1,4 +1,4 @@
-package com.example.star.zhihudaily.base;
+package com.example.star.zhihudaily.base.adapter;
 
 /**
  * Created by xiongxingxing on 15/10/26.

@@ -1,4 +1,4 @@
-package com.example.star.zhihudaily.base;
+package com.example.star.zhihudaily.base.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
