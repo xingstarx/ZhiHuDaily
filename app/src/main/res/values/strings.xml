@@ -39,6 +39,7 @@
     <string name="empty_text">empty is null</string>
     <string name="action_theme_add">关注</string>
     <string name="action_theme_remove">取消关注</string>
+    <string name="title_activity_news">内容详情</string>
 
 
 </resources>

@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.example.star.zhihudaily.api.AppAPI;
@@ -161,6 +162,7 @@ public class MainFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
+        mMainAdapter.setOnItemClickListener(mOnItemClickListener);
         mRecyclerView.setAdapter(mMainAdapter);
         EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
         onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
@@ -171,6 +173,15 @@ public class MainFragment extends Fragment {
         });
         mRecyclerView.addOnScrollListener(onScrollerListener);
     }
+
+    private AdapterView.OnItemClickListener mOnItemClickListener=new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // TODO: 15/12/26
+            Story story=mStoryList.get(position);
+
+        }
+    };
 
     /**
      * load more data logic

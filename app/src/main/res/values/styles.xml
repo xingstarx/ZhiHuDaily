@@ -37,5 +37,9 @@
         <item name="android:src">@drawable/ic_action_overflow</item>
     </style>
 
+    <style name="AppTheme.Theme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.Theme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 
 </resources>
