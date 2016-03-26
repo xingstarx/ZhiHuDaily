@@ -22,12 +22,13 @@ import com.example.star.zhihudaily.api.model.ThemeDesc;
 import com.example.star.zhihudaily.api.model.Themes;
 import com.example.star.zhihudaily.base.BaseActivity;
 import com.example.star.zhihudaily.base.adapter.ListHeaderBaseAdapter;
-import com.example.star.zhihudaily.base.db.ThemeDescDb;
+import com.example.star.zhihudaily.provider.ThemeDescProvider;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity {
     private View mMenuContent;
     private ListView mListView;
     private int mLastSelection;
-    private Themes mThemes;
+    private List<ThemeDesc> mThemeDescList;
     private ThemeDescAdapter mThemeDescAdapter;
     private MainFragment mainFragment;
     AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -55,14 +56,12 @@ public class MainActivity extends BaseActivity {
             mThemeDescAdapter.notifyDataSetInvalidated();//刷新页面,设置点击后,选中改行效果
         }
     };
-    private ThemeDescDb mThemeDescDb;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAppAPI = new AppAPI(this);
-        mThemeDescDb = new ThemeDescDb(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         setSupportActionBar(toolbar);
@@ -76,19 +75,15 @@ public class MainActivity extends BaseActivity {
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
         if (SharedPrefsUtils.getBooleanPreference(this, Settings.ZHIHU_HAS_THEME_THEMEDESC, false)) {
-            mThemeDescDb.open();
-            mThemes = mThemeDescDb.findAllThemes();
-            mThemeDescDb.close();
+            mThemeDescList = ThemeDescProvider.queryThemeDescList(MainActivity.this);
             initListViewData();
         } else {
             mSubscription = AppObservable.bindActivity(this, mAppAPI.themes()).subscribe(new Action1<Themes>() {
                 @Override
                 public void call(Themes themes) {
-                    mThemes = themes;
-                    LogUtils.d(TAG, new Gson().toJson(mThemes));
-                    mThemeDescDb.open();
-                    mThemeDescDb.addAllThemes(themes);
-                    mThemeDescDb.close();
+                    mThemeDescList = themes.others;
+                    ThemeDescProvider.addThemeDescList(MainActivity.this, mThemeDescList);
+                    LogUtils.d(TAG, new Gson().toJson(themes));
                     SharedPrefsUtils.setBooleanPreference(MainActivity.this, Settings.ZHIHU_HAS_THEME_THEMEDESC, true);
                     initListViewData();
                 }
@@ -104,7 +99,7 @@ public class MainActivity extends BaseActivity {
 
 
     private void initListViewData() {
-        mThemeDescAdapter = new ThemeDescAdapter(MainActivity.this, new ArrayList<>(mThemes.others), R.layout.draw_layout_item, R.layout.draw_layout_item_header);
+        mThemeDescAdapter = new ThemeDescAdapter(MainActivity.this, new ArrayList<>(mThemeDescList), R.layout.draw_layout_item, R.layout.draw_layout_item_header);
         mListView.setAdapter(mThemeDescAdapter);
         mListView.setOnItemClickListener(mOnItemClickListener);
         selectItem(0);
@@ -123,8 +118,8 @@ public class MainActivity extends BaseActivity {
             }
             getSupportActionBar().setTitle("首页");
         } else {
-            fragment = ThemeItemFragment.newInstance(mThemes.others.get(position - 1));
-            getSupportActionBar().setTitle(mThemes.others.get(position - 1).name);
+            fragment = ThemeItemFragment.newInstance(mThemeDescList.get(position - 1));
+            getSupportActionBar().setTitle(mThemeDescList.get(position - 1).name);
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_container, fragment).commit();
@@ -181,9 +176,7 @@ public class MainActivity extends BaseActivity {
                     Toast.makeText(MainActivity.this, "show infos", Toast.LENGTH_SHORT).show();
                     if (dataItem.is_like == false) {
                         dataItem.is_like = true;
-                        mThemeDescDb.open();
-                        mThemeDescDb.update(dataItem);
-                        mThemeDescDb.close();
+                        ThemeDescProvider.update(MainActivity.this, dataItem);
                         notifyDataSetChanged();
                     }
                 }

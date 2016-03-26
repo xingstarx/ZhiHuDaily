@@ -28,6 +28,12 @@
             android:name=".NewsActivity"
             android:label="@string/title_activity_news"
             android:theme="@style/AppTheme.Theme.NoActionBar" />
+
+        <provider
+            android:name=".provider.ThemeDescProvider"
+            android:authorities="com.example.star.zhihudaily.provider.themedesc"
+            android:enabled="true"
+            android:exported="false"></provider>
     </application>
 
 </manifest>

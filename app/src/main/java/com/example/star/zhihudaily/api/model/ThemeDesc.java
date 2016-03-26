@@ -4,36 +4,36 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.star.zhihudaily.base.db.ThemeDescDb;
+import com.example.star.zhihudaily.provider.ThemeDescProvider;
 
 import java.io.Serializable;
 
 /**
  * Created by xiongxingxing on 15/9/5.
  *
- * @desc 主题分类
+ * @desc 主题分类, 侧滑页面的item
  */
-public class ThemeDesc implements Serializable{
+public class ThemeDesc implements Serializable {
     public long color;
     public String thumbnail;
     public String description;
     public int id;
     public String name;
     public int _id;//db primary key
-    public boolean is_like;//用户是否喜欢
+    public transient boolean is_like;//用户是否喜欢
 
     public ThemeDesc() {
 
     }
 
     public ThemeDesc(@NonNull Cursor cursor) {
-        _id = cursor.getInt(cursor.getColumnIndex(ThemeDescDb.COL_ID));
-        color = cursor.getLong(cursor.getColumnIndex(ThemeDescDb.COL_COLOR));
-        name = cursor.getString(cursor.getColumnIndex(ThemeDescDb.COL_NAME));
-        thumbnail = cursor.getString(cursor.getColumnIndex(ThemeDescDb.COL_THUMBNAIL));
-        description = cursor.getString(cursor.getColumnIndex(ThemeDescDb.COL_DESCRIPTION));
-        id = cursor.getInt(cursor.getColumnIndex(ThemeDescDb.COL_THEMEID));
-        is_like = cursor.getInt(cursor.getColumnIndex(ThemeDescDb.COL_ISLIKE)) == 1 ? true : false;
+        _id = cursor.getInt(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_ID));
+        color = cursor.getLong(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_COLOR));
+        name = cursor.getString(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_NAME));
+        thumbnail = cursor.getString(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_THUMBNAIL));
+        description = cursor.getString(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_DESCRIPTION));
+        id = cursor.getInt(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_THEMEID));
+        is_like = cursor.getInt(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_ISLIKE)) == 1 ? true : false;
         Log.d("ThemeDesc", toString());
     }
 
