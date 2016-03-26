@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity {
         mMenuContainer = findViewById(R.id.menu_container);
         mMenuContent = findViewById(R.id.menu_content);
         mListView = (ListView) findViewById(R.id.listview);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_string, R.string.close_string);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.activity_main_open, R.string.activity_main_close);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
         if (SharedPrefsUtils.getBooleanPreference(this, Settings.ZHIHU_HAS_THEME_THEMEDESC, false)) {
@@ -113,10 +113,10 @@ public class MainActivity extends BaseActivity {
             if (mainFragment != null) {
                 fragment = mainFragment;
             } else {
-                mainFragment = MainFragment.newInstance("首页");
+                mainFragment = MainFragment.newInstance(getResources().getString(R.string.activity_main_title));
                 fragment = mainFragment;
             }
-            getSupportActionBar().setTitle("首页");
+            getSupportActionBar().setTitle(R.string.activity_main_title);
         } else {
             fragment = ThemeItemFragment.newInstance(mThemeDescList.get(position - 1));
             getSupportActionBar().setTitle(mThemeDescList.get(position - 1).name);

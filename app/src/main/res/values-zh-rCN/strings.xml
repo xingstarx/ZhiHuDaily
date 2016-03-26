@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="activity_main_open">打开</string>
+    <string name="activity_main_close">关闭</string>
+    <string name="activity_main_title">首页</string>
+
+
+</resources>
