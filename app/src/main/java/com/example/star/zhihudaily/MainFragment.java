@@ -3,6 +3,7 @@ package com.example.star.zhihudaily;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,14 +15,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.Story;
 import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
+import com.example.star.zhihudaily.base.adapter.HeaderAndFooterRecyclerViewAdapter;
+import com.example.star.zhihudaily.base.adapter.RecyclerViewUtils;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
+import com.example.star.zhihudaily.util.ContextUtils;
 import com.example.star.zhihudaily.util.DateUtils;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
@@ -31,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.bingoogolapple.bgabanner.BGABanner;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -47,11 +53,26 @@ public class MainFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private MainAdapter mMainAdapter;
+    private HeaderAndFooterRecyclerViewAdapter mHeaderViewRecyclerAdapter;
     private List<Story> mStoryList = new ArrayList<>();
+    private List<Story> mTopStoryList;//处理轮播图
     private Subscription mSubscription = Subscriptions.empty();
     private AppAPI mAppAPI;
     private String mCurrentDateStr = DateUtils.dateToString(new Date(), DateUtils.yyyyMMDD);
     private String mRefreshDateStr;
+    private BGABanner mBgaBanner;
+    private List<String> mBannerTips;
+    private List<View> mBannerViews;
+
+    @NonNull
+    private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // TODO: 15/12/26
+            Story story = mStoryList.get(position);
+
+        }
+    };
 
     public static MainFragment newInstance(String title) {
         MainFragment fragment = new MainFragment();
@@ -128,9 +149,16 @@ public class MainFragment extends Fragment {
             public void call(LatestNews latestNews) {
                 mStoryList = latestNews.stories;
                 mStoryList.addAll(latestNews.beforeLatestNews.stories);
+                mTopStoryList = latestNews.top_stories;
+                mBannerTips = getBannerTips(mTopStoryList);
+                mBgaBanner.setTips(mBannerTips);
+                for (int i = 0; i < mBannerViews.size(); i++) {
+                    ImageView imageView = (ImageView) mBannerViews.get(i);
+                    Picasso.with(mActivity).load(mTopStoryList.get(i).image).placeholder(R.drawable.ic_banner_default).fit().into(imageView);
+                }
                 mMainAdapter.setData(mStoryList);
-                mRefreshDateStr = latestNews.beforeLatestNews.date;
                 mMainAdapter.notifyDataSetChanged();
+                mRefreshDateStr = latestNews.beforeLatestNews.date;
                 if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
@@ -141,6 +169,23 @@ public class MainFragment extends Fragment {
                 Toast.makeText(mActivity, "MainFragment throwable==" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private List<String> getBannerTips(List<Story> topStoryList) {
+        List<String> tips = new ArrayList<>();
+        for (Story s : topStoryList) {
+            tips.add(s.title);
+        }
+        return tips;
+    }
+
+    private List<View> getBannerViews() {
+        List<View> views = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            ImageView view = (ImageView) LayoutInflater.from(mActivity).inflate(R.layout.view_image, null);
+            views.add(view);
+        }
+        return views;
     }
 
     private void initViews(View view) {
@@ -163,7 +208,8 @@ public class MainFragment extends Fragment {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
         mMainAdapter.setOnItemClickListener(mOnItemClickListener);
-        mRecyclerView.setAdapter(mMainAdapter);
+        mHeaderViewRecyclerAdapter = new HeaderAndFooterRecyclerViewAdapter(mMainAdapter);
+        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
         onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
             @Override
@@ -171,17 +217,20 @@ public class MainFragment extends Fragment {
                 loadMore();
             }
         });
+        mBgaBanner = (BGABanner) LayoutInflater.from(mActivity).inflate(R.layout.layout_banner, mRecyclerView, false);
+        mBannerViews = getBannerViews();
+        mBgaBanner.setViews(mBannerViews);
+        int baseHeight = ContextUtils.dp2px(mActivity, 225);
+        if (mBgaBanner.getLayoutParams() != null && mBgaBanner.getLayoutParams().height != baseHeight) {
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mBgaBanner.getLayoutParams();
+            LogUtils.e(TAG, "" + lp.height + ",  " + lp.width + "  " + lp.topMargin + "  " + lp.toString());
+            lp.topMargin = 0;
+            lp.height = baseHeight;
+        }
+        RecyclerViewUtils.setHeaderView(mRecyclerView, mBgaBanner);
+        mMainAdapter.notifyDataSetChanged();
         mRecyclerView.addOnScrollListener(onScrollerListener);
     }
-
-    private AdapterView.OnItemClickListener mOnItemClickListener=new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // TODO: 15/12/26
-            Story story=mStoryList.get(position);
-
-        }
-    };
 
     /**
      * load more data logic
@@ -249,7 +298,6 @@ public class MainFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             Story story = mStoryList.get(position);
-            LogUtils.d(TAG, story.toString());
             if (true) {
                 // TODO: 15/12/6
             }

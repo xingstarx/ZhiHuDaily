@@ -2,7 +2,6 @@ package com.example.star.zhihudaily.api.model;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.star.zhihudaily.provider.ThemeDescProvider;
 
@@ -34,7 +33,6 @@ public class ThemeDesc implements Serializable {
         description = cursor.getString(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_DESCRIPTION));
         id = cursor.getInt(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_THEMEID));
         is_like = cursor.getInt(cursor.getColumnIndex(ThemeDescProvider.ThemeDescColumns.COL_ISLIKE)) == 1 ? true : false;
-        Log.d("ThemeDesc", toString());
     }
 
     @Override
