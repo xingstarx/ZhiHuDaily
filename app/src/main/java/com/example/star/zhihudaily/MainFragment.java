@@ -15,28 +15,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.Story;
 import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
-import com.example.star.zhihudaily.base.adapter.HeaderAndFooterRecyclerViewAdapter;
-import com.example.star.zhihudaily.base.adapter.RecyclerViewUtils;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
-import com.example.star.zhihudaily.util.ContextUtils;
 import com.example.star.zhihudaily.util.DateUtils;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
+import com.example.star.zhihudaily.widget.Banner;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import cn.bingoogolapple.bgabanner.BGABanner;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -53,16 +49,12 @@ public class MainFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private MainAdapter mMainAdapter;
-    private HeaderAndFooterRecyclerViewAdapter mHeaderViewRecyclerAdapter;
     private List<Story> mStoryList = new ArrayList<>();
-    private List<Story> mTopStoryList;//处理轮播图
     private Subscription mSubscription = Subscriptions.empty();
     private AppAPI mAppAPI;
     private String mCurrentDateStr = DateUtils.dateToString(new Date(), DateUtils.yyyyMMDD);
     private String mRefreshDateStr;
-    private BGABanner mBgaBanner;
-    private List<String> mBannerTips;
-    private List<View> mBannerViews;
+    private Banner mBanner;
 
     @NonNull
     private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -149,13 +141,7 @@ public class MainFragment extends Fragment {
             public void call(LatestNews latestNews) {
                 mStoryList = latestNews.stories;
                 mStoryList.addAll(latestNews.beforeLatestNews.stories);
-                mTopStoryList = latestNews.top_stories;
-                mBannerTips = getBannerTips(mTopStoryList);
-                mBgaBanner.setTips(mBannerTips);
-                for (int i = 0; i < mBannerViews.size(); i++) {
-                    ImageView imageView = (ImageView) mBannerViews.get(i);
-                    Picasso.with(mActivity).load(mTopStoryList.get(i).image).placeholder(R.drawable.ic_banner_default).fit().into(imageView);
-                }
+                mBanner.handleAdapter(latestNews.top_stories);
                 mMainAdapter.setData(mStoryList);
                 mMainAdapter.notifyDataSetChanged();
                 mRefreshDateStr = latestNews.beforeLatestNews.date;
@@ -169,23 +155,6 @@ public class MainFragment extends Fragment {
                 Toast.makeText(mActivity, "MainFragment throwable==" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private List<String> getBannerTips(List<Story> topStoryList) {
-        List<String> tips = new ArrayList<>();
-        for (Story s : topStoryList) {
-            tips.add(s.title);
-        }
-        return tips;
-    }
-
-    private List<View> getBannerViews() {
-        List<View> views = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            ImageView view = (ImageView) LayoutInflater.from(mActivity).inflate(R.layout.view_image, null);
-            views.add(view);
-        }
-        return views;
     }
 
     private void initViews(View view) {
@@ -203,13 +172,13 @@ public class MainFragment extends Fragment {
             }
         });
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mBanner = (Banner) view.findViewById(R.id.banner);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
         mMainAdapter.setOnItemClickListener(mOnItemClickListener);
-        mHeaderViewRecyclerAdapter = new HeaderAndFooterRecyclerViewAdapter(mMainAdapter);
-        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
+        mRecyclerView.setAdapter(mMainAdapter);
         EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
         onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
             @Override
@@ -217,18 +186,6 @@ public class MainFragment extends Fragment {
                 loadMore();
             }
         });
-        mBgaBanner = (BGABanner) LayoutInflater.from(mActivity).inflate(R.layout.layout_banner, mRecyclerView, false);
-        mBannerViews = getBannerViews();
-        mBgaBanner.setViews(mBannerViews);
-        int baseHeight = ContextUtils.dp2px(mActivity, 225);
-        if (mBgaBanner.getLayoutParams() != null && mBgaBanner.getLayoutParams().height != baseHeight) {
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mBgaBanner.getLayoutParams();
-            LogUtils.e(TAG, "" + lp.height + ",  " + lp.width + "  " + lp.topMargin + "  " + lp.toString());
-            lp.topMargin = 0;
-            lp.height = baseHeight;
-        }
-        RecyclerViewUtils.setHeaderView(mRecyclerView, mBgaBanner);
-        mMainAdapter.notifyDataSetChanged();
         mRecyclerView.addOnScrollListener(onScrollerListener);
     }
 

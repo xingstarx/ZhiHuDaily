@@ -30,6 +30,4 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'io.reactivex:rxandroid:0.25.0'
     compile 'com.android.support:design:23.1.1'
-    compile 'com.nineoldandroids:library:2.4.0'
-    compile 'cn.bingoogolapple:bga-banner:2.0.3@aar'
 }
