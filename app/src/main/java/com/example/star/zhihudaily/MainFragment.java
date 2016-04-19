@@ -21,6 +21,8 @@ import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.Story;
 import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
+import com.example.star.zhihudaily.base.adapter.HeaderAndFooterRecyclerViewAdapter;
+import com.example.star.zhihudaily.base.adapter.RecyclerViewUtils;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
 import com.example.star.zhihudaily.util.DateUtils;
@@ -55,6 +57,7 @@ public class MainFragment extends Fragment {
     private String mCurrentDateStr = DateUtils.dateToString(new Date(), DateUtils.yyyyMMDD);
     private String mRefreshDateStr;
     private Banner mBanner;
+    private HeaderAndFooterRecyclerViewAdapter mHeaderViewRecyclerAdapter;
 
     @NonNull
     private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -143,7 +146,11 @@ public class MainFragment extends Fragment {
                 mStoryList.addAll(latestNews.beforeLatestNews.stories);
                 mBanner.handleAdapter(latestNews.top_stories);
                 mMainAdapter.setData(mStoryList);
-                mMainAdapter.notifyDataSetChanged();
+                // fix : use notifyItemChanged method,不会重置我们的header view，
+                // 导致轮播图的效果失效，notifyItemChanged调用后，会回到我们的HeaderAndFooterRecyclerView
+                // 里面注册的observer里面，更新逻辑也是从不包含header view的地方开始
+//                mMainAdapter.notifyDataSetChanged();
+                mMainAdapter.notifyItemChanged(0);
                 mRefreshDateStr = latestNews.beforeLatestNews.date;
                 if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -172,13 +179,13 @@ public class MainFragment extends Fragment {
             }
         });
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        mBanner = (Banner) view.findViewById(R.id.banner);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
+        mHeaderViewRecyclerAdapter = new HeaderAndFooterRecyclerViewAdapter(mMainAdapter);
         mMainAdapter.setOnItemClickListener(mOnItemClickListener);
-        mRecyclerView.setAdapter(mMainAdapter);
+        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
         onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
             @Override
@@ -186,6 +193,9 @@ public class MainFragment extends Fragment {
                 loadMore();
             }
         });
+
+        mBanner = (Banner) LayoutInflater.from(mActivity).inflate(R.layout.layout_banner, mRecyclerView, false);
+        RecyclerViewUtils.setHeaderView(mRecyclerView, mBanner);
         mRecyclerView.addOnScrollListener(onScrollerListener);
     }
 
