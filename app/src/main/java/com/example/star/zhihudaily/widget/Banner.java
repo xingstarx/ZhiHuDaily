@@ -1,6 +1,8 @@
 package com.example.star.zhihudaily.widget;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -11,15 +13,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.star.zhihudaily.NewsActivity;
 import com.example.star.zhihudaily.R;
 import com.example.star.zhihudaily.api.model.Story;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Banner
@@ -27,35 +27,29 @@ import java.util.TimerTask;
 public class Banner extends LinearLayout {
 
     public static final String TAG = "Banner";
+    private static final int MSG_PLAY = 1000;
     private final int FAKE_BANNER_SIZE = 100;
     private final int DEFAULT_BANNER_SIZE = 5;
+    private int mPlayInterval = 3000;
     private ViewPager mViewPager;
     private BannerAdapter bannerAdapter;
     private TextView mTitle;
     private ImageView[] mIndicator;
     private int mBannerPosition = 0;
-    private boolean mIsUserTouched = false;
     private View root;
     private Context mContext;
-    private Timer mTimer = new Timer();
     private List<Story> mTopStoryList;
 
-    private TimerTask mTimerTask = new TimerTask() {
+    private Handler mPlayHandler = new Handler() {
         @Override
-        public void run() {
-            if (!mIsUserTouched) {
-                mBannerPosition = (mBannerPosition + 1) % FAKE_BANNER_SIZE;
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mBannerPosition == FAKE_BANNER_SIZE - 1) {
-                            mViewPager.setCurrentItem(DEFAULT_BANNER_SIZE - 1, false);
-                        } else {
-                            mViewPager.setCurrentItem(mBannerPosition);
-                        }
-                    }
-                });
+        public void handleMessage(Message msg) {
+            mBannerPosition = (mBannerPosition + 1) % FAKE_BANNER_SIZE;
+            if (mBannerPosition == FAKE_BANNER_SIZE - 1) {
+                mViewPager.setCurrentItem(DEFAULT_BANNER_SIZE - 1, false);
+            } else {
+                mViewPager.setCurrentItem(mBannerPosition);
             }
+            mPlayHandler.sendEmptyMessageDelayed(MSG_PLAY, mPlayInterval);
         }
     };
 
@@ -76,6 +70,7 @@ public class Banner extends LinearLayout {
 
         }
     };
+    private boolean mIsPlaying = false;
 
     public Banner(Context context) {
         super(context);
@@ -112,9 +107,6 @@ public class Banner extends LinearLayout {
         root = LayoutInflater.from(mContext).inflate(R.layout.view_banner, null);
         addView(root, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         initView();
-        //第一个5000表示从调用schedule()方法到第一次执行mTimerTask的run()方法的时间间隔
-        //第二个5000表示以后每隔5000毫秒执行一次mTimerTask的run()方法
-        mTimer.schedule(mTimerTask, 5000, 5000);
         mViewPager.addOnPageChangeListener(mOnPageChangeListener);
     }
 
@@ -135,10 +127,15 @@ public class Banner extends LinearLayout {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
-                if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE) {
-                    mIsUserTouched = true;
-                } else if (action == MotionEvent.ACTION_UP) {
-                    mIsUserTouched = false;
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_MOVE:
+                        stopPlay();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        startPlay();
+                        break;
                 }
                 return false;
             }
@@ -150,15 +147,44 @@ public class Banner extends LinearLayout {
         mTopStoryList = topStoryList;
         bannerAdapter = new BannerAdapter(mContext);
         mViewPager.setAdapter(bannerAdapter);
+        startPlay();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
+        stopPlay();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            startPlay();
+        } else if (visibility == INVISIBLE) {
+            stopPlay();
         }
+    }
+
+    public void startPlay() {
+        if (!mIsPlaying) {
+            mIsPlaying = true;
+            mPlayHandler.sendEmptyMessageDelayed(MSG_PLAY, mPlayInterval);
+        }
+    }
+
+    public void stopPlay() {
+        if (mIsPlaying) {
+            mIsPlaying = false;
+            mPlayHandler.removeMessages(MSG_PLAY);
+        }
+    }
+
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        startPlay();
     }
 
     private class BannerAdapter extends PagerAdapter {
@@ -178,11 +204,10 @@ public class Banner extends LinearLayout {
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, pos + "-->" + mTopStoryList.get(pos).title, Toast.LENGTH_SHORT).show();
+                    NewsActivity.showNews(context);
                 }
             });
             container.addView(view);
-
             return view;
         }
 

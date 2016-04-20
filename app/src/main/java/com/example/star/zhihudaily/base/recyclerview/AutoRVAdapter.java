@@ -61,7 +61,7 @@ public abstract class AutoRVAdapter extends RecyclerView.Adapter<RVHolder> {
         return list.size();
     }
 
-    private AdapterView.OnItemClickListener onItemClickListener;
+    protected AdapterView.OnItemClickListener onItemClickListener;
 
     public AdapterView.OnItemClickListener getOnItemClickListener() {
         return onItemClickListener;

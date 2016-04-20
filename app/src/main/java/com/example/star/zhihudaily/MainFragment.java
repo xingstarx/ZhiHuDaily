@@ -24,6 +24,7 @@ import com.example.star.zhihudaily.base.EndlessRecyclerOnScrollListener;
 import com.example.star.zhihudaily.base.adapter.HeaderAndFooterRecyclerViewAdapter;
 import com.example.star.zhihudaily.base.adapter.RecyclerViewUtils;
 import com.example.star.zhihudaily.base.recyclerview.AutoRVAdapter;
+import com.example.star.zhihudaily.base.recyclerview.RVHolder;
 import com.example.star.zhihudaily.base.recyclerview.ViewHolder;
 import com.example.star.zhihudaily.util.DateUtils;
 import com.example.star.zhihudaily.util.LogUtils;
@@ -65,7 +66,7 @@ public class MainFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // TODO: 15/12/26
             Story story = mStoryList.get(position);
-
+            NewsActivity.showNews(mActivity);
         }
     };
 
@@ -146,11 +147,7 @@ public class MainFragment extends Fragment {
                 mStoryList.addAll(latestNews.beforeLatestNews.stories);
                 mBanner.handleAdapter(latestNews.top_stories);
                 mMainAdapter.setData(mStoryList);
-                // fix : use notifyItemChanged method,不会重置我们的header view，
-                // 导致轮播图的效果失效，notifyItemChanged调用后，会回到我们的HeaderAndFooterRecyclerView
-                // 里面注册的observer里面，更新逻辑也是从不包含header view的地方开始
-//                mMainAdapter.notifyDataSetChanged();
-                mMainAdapter.notifyItemChanged(0);
+                mMainAdapter.notifyDataSetChanged();
                 mRefreshDateStr = latestNews.beforeLatestNews.date;
                 if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
@@ -260,6 +257,19 @@ public class MainFragment extends Fragment {
         @Override
         public int onCreateViewLayoutID(int viewType) {
             return R.layout.recyclerview_item_story_layout;
+        }
+
+        @Override
+        public void onBindViewHolder(final RVHolder holder, final int position) {
+            onBindViewHolder(holder.getViewHolder(), position);
+            if (onItemClickListener != null) {
+                holder.getViewHolder().get(R.id.item_background_selector_panel).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onItemClickListener.onItemClick(null, v, holder.getAdapterPosition(), holder.getItemId());
+                    }
+                });
+            }
         }
 
         @Override

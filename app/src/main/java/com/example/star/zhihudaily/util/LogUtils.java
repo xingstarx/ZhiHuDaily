@@ -20,7 +20,7 @@ public final class LogUtils {
      * Insert the link at the end of the message
      */
     public static final int INSERT_LAST = 2;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final boolean VERBOSE = true;
     private static int sInsertMode = INSERT_LAST;
 
