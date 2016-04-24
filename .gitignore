@@ -10,8 +10,6 @@
 # files for the dex VM
 *.dex
 
-# Java class files
-*.class
 
 # generated files
 bin/
@@ -29,8 +27,6 @@ proguard/
 *.iws
 .idea/
 .DS_Store
-.idea/
 .gradle
 build/
-*.iml
 out/
