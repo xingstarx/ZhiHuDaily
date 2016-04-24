@@ -41,6 +41,105 @@
     <string name="action_theme_add">关注</string>
     <string name="action_theme_remove">取消关注</string>
     <string name="title_activity_news">内容详情</string>
+<string name="news_content" formatted="false">【刷机步骤】
+1.准备, 确认电脑上安装了USB驱动.确认方法,如:可连接,91,豌豆荚....
+.手机已刷recovery
+.准备,手机对应的ROM卡刷包.  记得是 卡刷包.后缀是 .zip
+.准备USB线
+
+2.电池上到手机里,手机关机.USB线 电脑和手机断开..
+
+3.手机进入recovery模式，同时按住音量增加，HOME，电源.
+.如:你想双清.现在双清. 想格式手机系统空间.现在请执行.
+
+4.手机USB线,连接电脑和手机
+
+5.英文版的,找到Install Zip  →   install zip from sideload.选择.中文对应的应该就adb sideload刷机模式.
+
+6.在电脑上,给你的ROM卡刷包. 拖到 sideload.bat上.(具体见附件)
+
+7.电脑上达到100%.手机会自动刷机, 此时，也可断开数据线。
+
+(这样的刷机模式,原理.是用ADB.exe给你的卡刷包传送到手机,刷机..不需要,手动复制到手机或卡空间.)
+
+解压后.里面有 sideload.bat 文件
+sideload.zip
+(554.73K)
+如: 出现 adb 不是内部或外部命令.....
+给.包里面的文件,复制到系统目录即可. 如 C:\WINDOWS, 如C:\WINDOWS\system32 都行.
+然后重新执行步骤6
+
+如果觉得 sideload.bat 使用复杂,而使用的人多.我可做个简单的程序.
+
+我刚开了微店，跪求人气，来访我网店者，每人送一个精美手机壳：http://www.2053216.okwei.com/zsjm.html
+        【刷机步骤】
+1.准备, 确认电脑上安装了USB驱动.确认方法,如:可连接,91,豌豆荚....
+.手机已刷recovery
+.准备,手机对应的ROM卡刷包.  记得是 卡刷包.后缀是 .zip
+.准备USB线
+
+2.电池上到手机里,手机关机.USB线 电脑和手机断开..
+
+3.手机进入recovery模式，同时按住音量增加，HOME，电源.
+.如:你想双清.现在双清. 想格式手机系统空间.现在请执行.
+
+4.手机USB线,连接电脑和手机
+
+5.英文版的,找到Install Zip  →   install zip from sideload.选择.中文对应的应该就adb sideload刷机模式.
+
+6.在电脑上,给你的ROM卡刷包. 拖到 sideload.bat上.(具体见附件)
+
+7.电脑上达到100%.手机会自动刷机, 此时，也可断开数据线。
+
+(这样的刷机模式,原理.是用ADB.exe给你的卡刷包传送到手机,刷机..不需要,手动复制到手机或卡空间.)
+
+解压后.里面有 sideload.bat 文件
+sideload.zip
+(554.73K)
+如: 出现 adb 不是内部或外部命令.....
+给.包里面的文件,复制到系统目录即可. 如 C:\WINDOWS, 如C:\WINDOWS\system32 都行.
+然后重新执行步骤6
+
+如果觉得 sideload.bat 使用复杂,而使用的人多.我可做个简单的程序.
+
+我刚开了微店，跪求人气，来访我网店者，每人送一个精美手机壳：http://www.2053216.okwei.com/zsjm.html
+
+
+        【刷机步骤】
+1.准备, 确认电脑上安装了USB驱动.确认方法,如:可连接,91,豌豆荚....
+.手机已刷recovery
+.准备,手机对应的ROM卡刷包.  记得是 卡刷包.后缀是 .zip
+.准备USB线
+
+2.电池上到手机里,手机关机.USB线 电脑和手机断开..
+
+3.手机进入recovery模式，同时按住音量增加，HOME，电源.
+.如:你想双清.现在双清. 想格式手机系统空间.现在请执行.
+
+4.手机USB线,连接电脑和手机
+
+5.英文版的,找到Install Zip  →   install zip from sideload.选择.中文对应的应该就adb sideload刷机模式.
+
+6.在电脑上,给你的ROM卡刷包. 拖到 sideload.bat上.(具体见附件)
+
+7.电脑上达到100%.手机会自动刷机, 此时，也可断开数据线。
+
+(这样的刷机模式,原理.是用ADB.exe给你的卡刷包传送到手机,刷机..不需要,手动复制到手机或卡空间.)
+
+解压后.里面有 sideload.bat 文件
+sideload.zip
+(554.73K)
+如: 出现 adb 不是内部或外部命令.....
+给.包里面的文件,复制到系统目录即可. 如 C:\WINDOWS, 如C:\WINDOWS\system32 都行.
+然后重新执行步骤6
+
+如果觉得 sideload.bat 使用复杂,而使用的人多.我可做个简单的程序.
+
+我刚开了微店，跪求人气，来访我网店者，每人送一个精美手机壳：http://www.2053216.okwei.com/zsjm.html</string>
+    <string name="browser_share">share</string>
+    <string name="collect">collect</string>
+    <string name="comment">comment</string>
+    <string name="add_praise">praise</string>
 
 
 </resources>

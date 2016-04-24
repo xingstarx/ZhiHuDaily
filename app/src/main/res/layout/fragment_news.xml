@@ -1,15 +1,76 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#f00">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerInParent="true"
-        android:text="@string/hello_blank_fragment" />
+    <LinearLayout
+        android:id="@+id/news_content_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="vertical">
 
-</RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/news_image_height">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/templete" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_banner_bottom" />
+
+
+            <TextView
+                android:id="@+id/story_image_source"
+                android:layout_width="wrap_content"
+                android:text="岳云鹏"
+                android:textColor="@color/zhihu_white"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/story_title"
+                android:layout_width="match_parent"
+                android:layout_above="@+id/story_image_source"
+                android:text="知乎账号 知乎账号 知乎账号 知乎账号知乎账号 知乎账号"
+                android:textSize="22sp"
+                android:textColor="@color/zhihu_white"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:ignore="WebViewLayout">
+
+            <!--<TextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/news_content"-->
+                <!--android:textSize="20sp" />-->
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

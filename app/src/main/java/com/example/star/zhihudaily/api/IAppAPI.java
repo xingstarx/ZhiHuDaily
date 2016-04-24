@@ -2,6 +2,7 @@ package com.example.star.zhihudaily.api;
 
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.StoryDetail;
+import com.example.star.zhihudaily.api.model.StoryExtraDetail;
 import com.example.star.zhihudaily.api.model.StoryNews;
 import com.example.star.zhihudaily.api.model.Themes;
 
@@ -27,6 +28,11 @@ public interface IAppAPI {
     //http://news-at.zhihu.com/api/4/story/7548380  于2015年12月19日抓包测试的新接口
     @GET("/story/{id}")
     Observable<StoryDetail> storyDetail(@Path("id") String id);
+
+    //评论,点赞数据汇总
+    @GET("/story-extra/{id}")
+    Observable<StoryExtraDetail> storyExtraDetail(@Path("id") String id);
+
 
     //curl http://news-at.zhihu.com/api/4/themes
     @GET("/themes")

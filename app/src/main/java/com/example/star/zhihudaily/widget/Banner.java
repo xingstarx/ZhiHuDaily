@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.example.star.zhihudaily.NewsActivity;
 import com.example.star.zhihudaily.R;
+import com.example.star.zhihudaily.Settings;
 import com.example.star.zhihudaily.api.model.Story;
+import com.example.star.zhihudaily.util.SharedPrefsUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -204,11 +206,23 @@ public class Banner extends LinearLayout {
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    NewsActivity.showNews(context);
+                    SharedPrefsUtils.setStringPreference(context, Settings.ZHIHU_NEWS_VIEWPAGER_COUNT_JSON, renderJson(mTopStoryList));
+                    NewsActivity.showNews(context, mTopStoryList.get(pos).id);
                 }
             });
             container.addView(view);
             return view;
+        }
+
+        private String renderJson(List<Story> storyList) {
+            if (storyList == null && storyList.size() == 0) {
+                return null;
+            }
+            StringBuffer sbf = new StringBuffer();
+            for (Story story : storyList) {
+                sbf.append(story.id).append(",");
+            }
+            return sbf.toString();
         }
 
         @Override

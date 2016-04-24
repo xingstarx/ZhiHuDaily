@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.star.zhihudaily.api.model.LatestNews;
 import com.example.star.zhihudaily.api.model.StoryDetail;
+import com.example.star.zhihudaily.api.model.StoryExtraDetail;
 import com.example.star.zhihudaily.api.model.StoryNews;
 import com.example.star.zhihudaily.api.model.Themes;
 
@@ -30,6 +31,10 @@ public class AppAPI extends BaseAPI {
 
     public Observable<StoryDetail> storyDetail(String id) {
         return mAppAPI.storyDetail(id);
+    }
+
+    public Observable<StoryExtraDetail> storyExtraDetail(String id) {
+        return mAppAPI.storyExtraDetail(id);
     }
 
     public Observable<Themes> themes() {

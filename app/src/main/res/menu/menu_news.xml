@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/browser_share"
+        android:title="@string/browser_share"
+        android:icon="@drawable/ic_menu_share"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/collect"
+        android:title="@string/collect"
+        android:icon="@drawable/ic_menu_collect"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/comment"
+        android:title="@string/comment"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/add_praise"
+        android:title="@string/add_praise"
+        app:showAsAction="always" />
+
+</menu>

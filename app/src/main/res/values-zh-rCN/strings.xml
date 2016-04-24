@@ -4,6 +4,10 @@
     <string name="activity_main_open">打开</string>
     <string name="activity_main_close">关闭</string>
     <string name="activity_main_title">首页</string>
+    <string name="browser_share">分享</string>
+    <string name="collect">收藏</string>
+    <string name="comment">评论</string>
+    <string name="add_praise">点赞</string>
 
 
 </resources>

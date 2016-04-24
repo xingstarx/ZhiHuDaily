@@ -64,9 +64,9 @@ public class MainFragment extends Fragment {
     private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // TODO: 15/12/26
             Story story = mStoryList.get(position);
-            NewsActivity.showNews(mActivity);
+            SharedPrefsUtils.setStringPreference(mActivity, Settings.ZHIHU_NEWS_VIEWPAGER_COUNT_JSON, renderJson(mStoryList));
+            NewsActivity.showNews(mActivity, story.id);
         }
     };
 
@@ -76,6 +76,17 @@ public class MainFragment extends Fragment {
         args.putString(ARG_TITLE, title);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    private String renderJson(List<Story> storyList) {
+        if (storyList == null && storyList.size() == 0) {
+            return null;
+        }
+        StringBuffer sbf = new StringBuffer();
+        for (Story story : storyList) {
+            sbf.append(story.id).append(",");
+        }
+        return sbf.toString();
     }
 
     @Override
