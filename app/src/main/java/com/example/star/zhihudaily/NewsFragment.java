@@ -206,6 +206,8 @@ public class NewsFragment extends Fragment {
         mWebSettings.setDefaultTextEncodingName("GBK");
         mWebSettings.setLoadsImagesAutomatically(true);
         url = "http://frank-zhu.github.io/android/2015/08/19/android-html5-web-view/";
+
+        url = "file:///android_asset/test.html";
         mWebView.loadUrl(url);
     }
 }
