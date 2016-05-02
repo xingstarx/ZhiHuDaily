@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +23,7 @@ import android.widget.ScrollView;
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.StoryDetail;
 import com.example.star.zhihudaily.api.model.StoryExtraDetail;
+import com.example.star.zhihudaily.base.LazyFragment;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.widget.CustomMenuView;
 
@@ -38,7 +38,7 @@ import rx.functions.Func2;
 import rx.subscriptions.Subscriptions;
 
 
-public class NewsFragment extends Fragment {
+public class NewsFragment extends LazyFragment {
     public static final String ARG_ID = "id";
     private static final String TAG = "NewsFragment";
     private static final String FIND_TEMPLETE_KEY = "%%TEMPLETE_DIV_CONTENT%%";
@@ -59,6 +59,7 @@ public class NewsFragment extends Fragment {
     private WebView mWebView;
     private StoryDetail mStoryDetail;
     private StoryExtraDetail mStoryExtraDetail;
+    private boolean isPrepared = false;
 
     private ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener() {
         @Override
@@ -156,25 +157,8 @@ public class NewsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.storyDetail(mId).zipWith(mAppAPI.storyExtraDetail(mId), new Func2<StoryDetail, StoryExtraDetail, StoryDetail>() {
-            @Override
-            public StoryDetail call(StoryDetail storyDetail, StoryExtraDetail storyExtraDetail) {
-                mStoryDetail = storyDetail;
-                mStoryExtraDetail = storyExtraDetail;
-                return storyDetail;
-            }
-        })).subscribe(new Action1<StoryDetail>() {
-            @Override
-            public void call(StoryDetail storyDetail) {
-                startWebView(storyDetail);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-
-            }
-        });
-
+        isPrepared = true;
+        lazyLoad();
     }
 
     @Override
@@ -201,6 +185,7 @@ public class NewsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mScrollView.getViewTreeObserver().removeOnScrollChangedListener(mOnScrollChangedListener);
         mSubscription.unsubscribe();
     }
 
@@ -244,5 +229,30 @@ public class NewsFragment extends Fragment {
         } finally {
             br.close();
         }
+    }
+
+    @Override
+    protected void lazyLoad() {
+        if (!isVisible || !isPrepared) {
+            return;
+        }
+        mSubscription = AppObservable.bindSupportFragment(this, mAppAPI.storyDetail(mId).zipWith(mAppAPI.storyExtraDetail(mId), new Func2<StoryDetail, StoryExtraDetail, StoryDetail>() {
+            @Override
+            public StoryDetail call(StoryDetail storyDetail, StoryExtraDetail storyExtraDetail) {
+                mStoryDetail = storyDetail;
+                mStoryExtraDetail = storyExtraDetail;
+                return storyDetail;
+            }
+        })).subscribe(new Action1<StoryDetail>() {
+            @Override
+            public void call(StoryDetail storyDetail) {
+                startWebView(storyDetail);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+
+            }
+        });
     }
 }
