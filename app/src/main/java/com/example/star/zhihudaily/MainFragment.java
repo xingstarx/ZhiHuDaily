@@ -279,7 +279,7 @@ public class MainFragment extends Fragment {
                 holder.getViewHolder().get(R.id.item_background_selector_panel).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onItemClickListener.onItemClick(null, v, holder.getAdapterPosition(), holder.getItemId());
+                        onItemClickListener.onItemClick(null, v, RecyclerViewUtils.getAdapterPosition(mRecyclerView, holder), holder.getItemId());
                     }
                 });
             }
