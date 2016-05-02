@@ -14,20 +14,24 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 
 import com.example.star.zhihudaily.base.BaseActivity;
+import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class NewsActivity extends BaseActivity {
 
-    private ViewPager mViewPager;
-    private NewsAdapter mNewsAdapter;
-    private Toolbar mToolbar;
+    @Bind(R.id.view_pager)
+    ViewPager mViewPager;
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
     private Drawable upArrow;
     private List<String> mNewsIdList;
-    private String mNewsId;
     private static final String TAG = "NewsActivity";
 
     public static void showNews(Context context, long newsId) {
@@ -41,9 +45,8 @@ public class NewsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
-        mNewsId = getIntent().getLongExtra(NewsFragment.ARG_ID, 0) + "";
-        mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        mToolbar = (Toolbar) findViewById(R.id.layout_toolbar);
+        ButterKnife.bind(this);
+        String mNewsId = getIntent().getLongExtra(NewsFragment.ARG_ID, 0) + "";
         upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -54,7 +57,7 @@ public class NewsActivity extends BaseActivity {
 
         mNewsIdList = TextUtils.isEmpty(newsViewPagerCountJson) ? new ArrayList<String>(0) : Arrays.asList(newsViewPagerCountJson.split(","));
 
-        mNewsAdapter = new NewsAdapter(getSupportFragmentManager());
+        NewsAdapter mNewsAdapter = new NewsAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mNewsAdapter);
         if (!TextUtils.equals(mNewsId, "0")) {
             mViewPager.setCurrentItem(mNewsIdList.indexOf(mNewsId));

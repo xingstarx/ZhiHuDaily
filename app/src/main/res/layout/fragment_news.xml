@@ -17,6 +17,7 @@
             android:layout_height="@dimen/news_image_height">
 
             <ImageView
+                android:id="@+id/session_photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
@@ -60,11 +61,6 @@
             android:layout_marginTop="8dp"
             tools:ignore="WebViewLayout">
 
-            <!--<TextView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="@string/news_content"-->
-                <!--android:textSize="20sp" />-->
             <WebView
                 android:id="@+id/web_view"
                 android:layout_width="match_parent"

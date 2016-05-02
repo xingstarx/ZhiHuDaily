@@ -12,7 +12,7 @@
         android:layout_height="match_parent" />
 
     <include
-        android:id="@+id/layout_toolbar"
+        android:id="@+id/toolbar"
         layout="@layout/layout_toolbar" />
 
 </RelativeLayout>

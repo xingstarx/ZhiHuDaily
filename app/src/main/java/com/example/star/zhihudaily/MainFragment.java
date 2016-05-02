@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -47,10 +49,12 @@ import rx.subscriptions.Subscriptions;
 public class MainFragment extends Fragment {
     public static final String TAG = MainFragment.class.getSimpleName();
     private static final String ARG_TITLE = "title";
+    @Bind(R.id.recycler_view)
+    RecyclerView mRecyclerView;
+    @Bind(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
     private Activity mActivity;
     private String mTitle;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView mRecyclerView;
     private MainAdapter mMainAdapter;
     private List<Story> mStoryList = new ArrayList<>();
     private Subscription mSubscription = Subscriptions.empty();
@@ -58,7 +62,6 @@ public class MainFragment extends Fragment {
     private String mCurrentDateStr = DateUtils.dateToString(new Date(), DateUtils.yyyyMMDD);
     private String mRefreshDateStr;
     private Banner mBanner;
-    private HeaderAndFooterRecyclerViewAdapter mHeaderViewRecyclerAdapter;
 
     @NonNull
     private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -102,7 +105,8 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        initViews(view);
+        ButterKnife.bind(this, view);
+        initViews();
         return view;
     }
 
@@ -172,8 +176,7 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private void initViews(View view) {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+    private void initViews() {
         mSwipeRefreshLayout.setColorSchemeResources(
                 R.color.google_blue,
                 R.color.google_green,
@@ -186,14 +189,13 @@ public class MainFragment extends Fragment {
                 doRefresh();
             }
         });
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mMainAdapter = new MainAdapter(mActivity, mStoryList);
-        mHeaderViewRecyclerAdapter = new HeaderAndFooterRecyclerViewAdapter(mMainAdapter);
+        HeaderAndFooterRecyclerViewAdapter headerViewRecyclerAdapter = new HeaderAndFooterRecyclerViewAdapter(mMainAdapter);
         mMainAdapter.setOnItemClickListener(mOnItemClickListener);
-        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
+        mRecyclerView.setAdapter(headerViewRecyclerAdapter);
         EndlessRecyclerOnScrollListener onScrollerListener = new EndlessRecyclerOnScrollListener();
         onScrollerListener.setOnListLoadNextPageListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
             @Override
@@ -252,7 +254,7 @@ public class MainFragment extends Fragment {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
         }
-
+        ButterKnife.unbind(this);
     }
 
     class MainAdapter extends AutoRVAdapter {

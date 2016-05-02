@@ -18,7 +18,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.StoryDetail;
@@ -31,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.functions.Action1;
@@ -42,8 +47,19 @@ public class NewsFragment extends LazyFragment {
     public static final String ARG_ID = "id";
     private static final String TAG = "NewsFragment";
     private static final String FIND_TEMPLETE_KEY = "%%TEMPLETE_DIV_CONTENT%%";
+    @Bind(R.id.session_photo)
+    ImageView mSessionPhoto;
+    @Bind(R.id.story_image_source)
+    TextView mStoryImageSource;
+    @Bind(R.id.story_title)
+    TextView mStoryTitle;
+    @Bind(R.id.web_view)
+    WebView mWebView;
+    @Bind(R.id.news_content_panel)
+    LinearLayout mNewsContentPanel;
+    @Bind(R.id.scroll_view)
+    ScrollView mScrollView;
     private String mId;
-    private ScrollView mScrollView;
     private int mLastScrolly = -1;
     private boolean mIsTansparency = false;
     private boolean mToolbarFlag = false;
@@ -56,7 +72,6 @@ public class NewsFragment extends LazyFragment {
     private CustomMenuView mCollectView;
     private Subscription mSubscription = Subscriptions.empty();
     private AppAPI mAppAPI;
-    private WebView mWebView;
     private StoryDetail mStoryDetail;
     private StoryExtraDetail mStoryExtraDetail;
     private boolean isPrepared = false;
@@ -136,8 +151,12 @@ public class NewsFragment extends LazyFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_news, container, false);
-        mScrollView = (ScrollView) root.findViewById(R.id.scroll_view);
-        mWebView = (WebView) root.findViewById(R.id.web_view);
+        ButterKnife.bind(this, root);
+        initViews();
+        return root;
+    }
+
+    private void initViews() {
         mToolbarColor = ContextCompat.getColor(mActivity, R.color.colorPrimary);
         mShareView = new CustomMenuView(mActivity);
         mCollectView = new CustomMenuView(mActivity);
@@ -151,7 +170,7 @@ public class NewsFragment extends LazyFragment {
         mNewsImageHeight = getResources().getDimensionPixelSize(R.dimen.news_image_height);
         updateActionBarTransparency(1);
         mScrollView.getViewTreeObserver().addOnScrollChangedListener(mOnScrollChangedListener);
-        return root;
+
     }
 
     @Override
@@ -187,6 +206,7 @@ public class NewsFragment extends LazyFragment {
         super.onDestroyView();
         mScrollView.getViewTreeObserver().removeOnScrollChangedListener(mOnScrollChangedListener);
         mSubscription.unsubscribe();
+        ButterKnife.unbind(this);
     }
 
     private void startWebView(StoryDetail storyDetail) {
@@ -208,7 +228,7 @@ public class NewsFragment extends LazyFragment {
             e.printStackTrace();
         }
 
-        if(!TextUtils.isEmpty(data)){
+        if (!TextUtils.isEmpty(data)) {
             String contentDiv = storyDetail.body;
             data = data.replaceAll(FIND_TEMPLETE_KEY, contentDiv);
             mWebView.loadDataWithBaseURL(baseUrl, data, "text/html", "UTF-8", "about:blank");

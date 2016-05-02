@@ -27,6 +27,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.functions.Action1;
@@ -36,9 +38,11 @@ import rx.subscriptions.Subscriptions;
 public class ThemeItemFragment extends Fragment {
     public static final String TAG = ThemeItemFragment.class.getSimpleName();
     private static final String ARG_THEME_DESC = "themeDesc";
+    @Bind(R.id.recycler_view)
+    RecyclerView mRecyclerView;
+    @Bind(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
     private Activity mActivity;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView mRecyclerView;
     private MainAdapter mMainAdapter;
     private List<Story> mStoryList = new ArrayList<>();
     private Subscription mSubscription = Subscriptions.empty();
@@ -67,7 +71,8 @@ public class ThemeItemFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_theme, container, false);
-        initViews(view);
+        ButterKnife.bind(this, view);
+        initViews();
         return view;
     }
 
@@ -115,8 +120,7 @@ public class ThemeItemFragment extends Fragment {
 
     }
 
-    private void initViews(View view) {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+    private void initViews() {
         mSwipeRefreshLayout.setColorSchemeResources(
                 R.color.google_blue,
                 R.color.google_green,
@@ -129,7 +133,6 @@ public class ThemeItemFragment extends Fragment {
                 doRefresh();
             }
         });
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -143,7 +146,6 @@ public class ThemeItemFragment extends Fragment {
             }
         });
         mRecyclerView.addOnScrollListener(onScrollerListener);
-
     }
 
     private void loadMore() {
@@ -188,7 +190,7 @@ public class ThemeItemFragment extends Fragment {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
         }
-
+        ButterKnife.unbind(this);
     }
 
     class MainAdapter extends AutoRVAdapter {

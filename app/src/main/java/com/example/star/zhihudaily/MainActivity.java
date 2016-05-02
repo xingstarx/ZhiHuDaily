@@ -12,7 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,26 +27,38 @@ import com.example.star.zhihudaily.base.adapter.ListHeaderBaseAdapter;
 import com.example.star.zhihudaily.provider.ThemeDescProvider;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.util.SharedPrefsUtils;
+import com.example.star.zhihudaily.widget.BezelImageView;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.app.AppObservable;
 import rx.functions.Action1;
 import rx.subscriptions.Subscriptions;
 
 public class MainActivity extends BaseActivity {
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
+    @Bind(R.id.content_container)
+    FrameLayout mContentContainer;
+    @Bind(R.id.profile_avatar)
+    BezelImageView mProfileAvatar;
+    @Bind(R.id.listview)
+    ListView mListView;
+    @Bind(R.id.menu_content)
+    FrameLayout mMenuContent;
+    @Bind(R.id.menu_container)
+    LinearLayout mMenuContainer;
+    @Bind(R.id.drawer)
+    DrawerLayout mDrawerLayout;
     private AppAPI mAppAPI;
     private Subscription mSubscription = Subscriptions.empty();
     private String TAG = MainActivity.class.getSimpleName();
     private ActionBarDrawerToggle actionBarDrawerToggle;
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private View mMenuContainer;
-    private View mMenuContent;
-    private ListView mListView;
     private int mLastSelection;
     private List<ThemeDesc> mThemeDescList;
     private ThemeDescAdapter mThemeDescAdapter;
@@ -61,18 +75,14 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         mAppAPI = new AppAPI(this);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white);
 
-        mMenuContainer = findViewById(R.id.menu_container);
-        mMenuContent = findViewById(R.id.menu_content);
-        mListView = (ListView) findViewById(R.id.listview);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.activity_main_open, R.string.activity_main_close);
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.activity_main_open, R.string.activity_main_close);
+        mDrawerLayout.setDrawerListener(actionBarDrawerToggle);
 
         if (SharedPrefsUtils.getBooleanPreference(this, Settings.ZHIHU_HAS_THEME_THEMEDESC, false)) {
             mThemeDescList = ThemeDescProvider.queryThemeDescList(MainActivity.this);
@@ -126,7 +136,7 @@ public class MainActivity extends BaseActivity {
 
         // update selected item and title, then close the drawer
         mListView.setItemChecked(position, true);
-        drawerLayout.closeDrawer(mMenuContainer);
+        mDrawerLayout.closeDrawer(mMenuContainer);
 
     }
 
