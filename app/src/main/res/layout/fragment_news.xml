@@ -20,8 +20,7 @@
                 android:id="@+id/session_photo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="fitXY"
-                android:src="@drawable/templete" />
+                />
 
 
             <View

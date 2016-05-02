@@ -29,6 +29,7 @@ import com.example.star.zhihudaily.api.model.StoryExtraDetail;
 import com.example.star.zhihudaily.base.LazyFragment;
 import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.widget.CustomMenuView;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -209,7 +210,7 @@ public class NewsFragment extends LazyFragment {
         ButterKnife.unbind(this);
     }
 
-    private void startWebView(StoryDetail storyDetail) {
+    private void loadWebView(StoryDetail storyDetail) {
         String url = "templete.html";
         String baseUrl = "http://news-at.zhihu.com";
         String data;
@@ -266,7 +267,8 @@ public class NewsFragment extends LazyFragment {
         })).subscribe(new Action1<StoryDetail>() {
             @Override
             public void call(StoryDetail storyDetail) {
-                startWebView(storyDetail);
+                loadWebView(storyDetail);
+                loadData();
             }
         }, new Action1<Throwable>() {
             @Override
@@ -275,4 +277,13 @@ public class NewsFragment extends LazyFragment {
             }
         });
     }
+
+    private void loadData () {
+        mCommentMenuView.setTextValue(mStoryExtraDetail.comments + "");
+        mPraiseMenuView.setTextValue(mStoryExtraDetail.popularity + "");
+        Picasso.with(mActivity).load(mStoryDetail.image).placeholder(R.drawable.templete).fit().centerCrop().into(mSessionPhoto);
+        mStoryImageSource.setText(mStoryDetail.image_source);
+        mStoryTitle.setText(mStoryDetail.title);
+    }
+
 }

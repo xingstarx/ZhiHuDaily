@@ -201,7 +201,7 @@ public class Banner extends LinearLayout {
             position %= DEFAULT_BANNER_SIZE;
             View view = LayoutInflater.from(context).inflate(R.layout.banner_item, container, false);
             ImageView image = (ImageView) view.findViewById(R.id.image);
-            Picasso.with(context).load(mTopStoryList.get(position).image).placeholder(R.drawable.ic_banner_default).fit().into(image);
+            Picasso.with(context).load(mTopStoryList.get(position).image).placeholder(R.drawable.ic_banner_default).fit().centerCrop().into(image);
             final int pos = position;
             view.setOnClickListener(new OnClickListener() {
                 @Override
