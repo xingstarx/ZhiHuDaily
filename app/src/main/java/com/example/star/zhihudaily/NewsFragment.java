@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,7 +24,12 @@ import android.widget.ScrollView;
 import com.example.star.zhihudaily.api.AppAPI;
 import com.example.star.zhihudaily.api.model.StoryDetail;
 import com.example.star.zhihudaily.api.model.StoryExtraDetail;
+import com.example.star.zhihudaily.util.LogUtils;
 import com.example.star.zhihudaily.widget.CustomMenuView;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import rx.Subscription;
 import rx.android.app.AppObservable;
@@ -35,6 +41,7 @@ import rx.subscriptions.Subscriptions;
 public class NewsFragment extends Fragment {
     public static final String ARG_ID = "id";
     private static final String TAG = "NewsFragment";
+    private static final String FIND_TEMPLETE_KEY = "%%TEMPLETE_DIV_CONTENT%%";
     private String mId;
     private ScrollView mScrollView;
     private int mLastScrolly = -1;
@@ -159,8 +166,7 @@ public class NewsFragment extends Fragment {
         })).subscribe(new Action1<StoryDetail>() {
             @Override
             public void call(StoryDetail storyDetail) {
-                String TMP_URL = "http://stackoverflow.com/questions/10397613/how-can-i-get-the-current-location-of-an-actionbar-menuitem/13300185";
-//                startWebView(TMP_URL);
+                startWebView(storyDetail);
             }
         }, new Action1<Throwable>() {
             @Override
@@ -168,7 +174,7 @@ public class NewsFragment extends Fragment {
 
             }
         });
-        startWebView("");
+
     }
 
     @Override
@@ -198,16 +204,45 @@ public class NewsFragment extends Fragment {
         mSubscription.unsubscribe();
     }
 
-    private void startWebView(String url) {
+    private void startWebView(StoryDetail storyDetail) {
+        String url = "templete.html";
+        String baseUrl = "http://news-at.zhihu.com";
+        String data;
         WebSettings mWebSettings = mWebView.getSettings();
         mWebSettings.setSupportZoom(true);
         mWebSettings.setLoadWithOverviewMode(true);
         mWebSettings.setUseWideViewPort(true);
         mWebSettings.setDefaultTextEncodingName("GBK");
         mWebSettings.setLoadsImagesAutomatically(true);
-        url = "http://frank-zhu.github.io/android/2015/08/19/android-html5-web-view/";
 
-        url = "file:///android_asset/test.html";
-        mWebView.loadUrl(url);
+        try {
+            InputStream in = getActivity().getAssets().open(url);
+            data = inputStream2String(in);
+        } catch (Exception e) {
+            data = null;
+            e.printStackTrace();
+        }
+
+        if(!TextUtils.isEmpty(data)){
+            String contentDiv = storyDetail.body;
+            data = data.replaceAll(FIND_TEMPLETE_KEY, contentDiv);
+            mWebView.loadDataWithBaseURL(baseUrl, data, "text/html", "UTF-8", "about:blank");
+        }
+
+    }
+
+    private String inputStream2String(InputStream in) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line);
+                line = br.readLine();
+            }
+            return sb.toString();
+        } finally {
+            br.close();
+        }
     }
 }
