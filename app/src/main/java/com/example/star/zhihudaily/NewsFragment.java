@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -220,6 +221,15 @@ public class NewsFragment extends LazyFragment {
         mWebSettings.setUseWideViewPort(true);
         mWebSettings.setDefaultTextEncodingName("GBK");
         mWebSettings.setLoadsImagesAutomatically(true);
+
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setHorizontalScrollBarEnabled(false);
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return event.getAction() == MotionEvent.ACTION_MOVE;
+            }
+        });
 
         try {
             InputStream in = getActivity().getAssets().open(url);
