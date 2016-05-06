@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -213,7 +214,7 @@ public class NewsFragment extends LazyFragment {
 
     private void loadWebView(StoryDetail storyDetail) {
         String url = "templete.html";
-        String baseUrl = "http://news-at.zhihu.com";
+        String baseUrl = "file:///android_asset/";
         String data;
         WebSettings mWebSettings = mWebView.getSettings();
         mWebSettings.setSupportZoom(true);
@@ -222,6 +223,10 @@ public class NewsFragment extends LazyFragment {
         mWebSettings.setDefaultTextEncodingName("GBK");
         mWebSettings.setLoadsImagesAutomatically(true);
 
+//        Configure WebViews for debugging
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
         mWebView.setVerticalScrollBarEnabled(false);
         mWebView.setHorizontalScrollBarEnabled(false);
         mWebView.setOnTouchListener(new View.OnTouchListener() {
