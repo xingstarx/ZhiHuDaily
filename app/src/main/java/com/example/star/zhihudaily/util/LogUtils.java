@@ -2,6 +2,8 @@ package com.example.star.zhihudaily.util;
 
 import android.util.Log;
 
+import com.example.star.zhihudaily.BuildConfig;
+
 /**
  * A utility class to insert logs in Android Log Cat, with link to the line calling it (much like in an exception stack trace).
  */
@@ -20,7 +22,7 @@ public final class LogUtils {
      * Insert the link at the end of the message
      */
     public static final int INSERT_LAST = 2;
-    private static final boolean DEBUG = false;
+    public static final boolean DEBUG = BuildConfig.DEBUG;
     private static final boolean VERBOSE = true;
     private static int sInsertMode = INSERT_LAST;
 

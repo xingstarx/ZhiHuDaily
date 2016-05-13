@@ -2,6 +2,8 @@ package com.example.star.zhihudaily.api;
 
 import android.content.Context;
 
+import com.example.star.zhihudaily.util.LogUtils;
+import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -25,6 +27,9 @@ public class BaseAPI {
     public BaseAPI(Context context) {
         File cacheDir = new File(context.getCacheDir(), "ZhiHuCache");
         okHttpClient = new OkHttpClient();
+        if (LogUtils.DEBUG) {
+            okHttpClient.networkInterceptors().add(new StethoInterceptor());
+        }
         okHttpClient.setCache(new Cache(cacheDir, CACHE_SIZE));
         okHttpClient.setConnectTimeout(TIMEOUT_MILLISEC, TimeUnit.MILLISECONDS);
         RestAdapter.Builder builder = new RestAdapter.Builder();
